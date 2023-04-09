@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Lyrics Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+        }
+
+        .chatbox {
+            height: 400px;
+            overflow: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+        .message {
+            margin-bottom: 10px;
+        }
+
+        .user {
+            color: blue;
+        }
+
+        .bot {
+            color: green;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Lyrics to Music Generator</h1>
+    <div class="chatbox" id="chatbox"></div>
+    <input type="text" id="message" placeholder="Type your message here...">
+    <button id="send">Generate Lyrics</button>
+    <button id="play">Play Music</button>
+    <script>
+        var chatbox = document.getElementById("chatbox");
+        var message = document.getElementById("message");
+        var send = document.getElementById("send");
+        var play = document.getElementById("play");
+        var responses = {};
+
+        send.addEventListener("click", function () {
+            var userMessage = message.value;
+            var userDiv = document.createElement("div");
+            userDiv.className = "message user";
+            userDiv.innerHTML = "<strong>You:</strong> " + userMessage;
+            chatbox.appendChild(userDiv);
+
+            message.value = "";
+
+            fetch("/get_response?message=" + encodeURIComponent(userMessage))
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data
+                ) {
+                    var botDiv = document.createElement("div");
+                    botDiv.className = "message bot";
+                    botDiv.innerHTML = "<strong>Chan:</strong> " + data.text;
+                    chatbox.appendChild(botDiv);
+
+                    chatbox.scrollTop = chatbox.scrollHeight;
+
+                    // Update the latest response ID
+                    responses[data.id] = data.text;
+                });
+        });
+
+
+        play.addEventListener("click", function () {
+            // var musicFiles = ["/static/test1.mp3"];
+            // var musicFile = musicFiles[Math.floor(Math.random() * musicFiles.length)];
+            var latestResponseId = Object.keys(responses).pop();
+            if (latestResponseId) {
+                // get the user's message
+                var userMessage = message.value.toLowerCase();
+
+
+                var audioUrl = "/static/" + latestResponseId + ".mp3";
+                var audio = new Audio(audioUrl);
+                audio.play();
+
+
+
+                bgMusic = new Audio(musicFile);
+                bgMusic.loop = true;
+                bgMusic.play();
+
+                // Add an event listener to the audio object to detect when it finishes playing
+                audio.addEventListener("ended", function () {
+                    bgMusic.pause();
+                });
+            }
+        });
+    </script>
+
+</body>
+
+</html>
